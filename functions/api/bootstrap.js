@@ -1,6 +1,9 @@
 const ASSET_FILES = [
   'ainanika_icon.png',
   'ainanika_logo.png',
+  'button_dress.png',
+  'button_hanasu.png',
+  'button_session.png',
   'ghost_excited.png',
   'ghost_happy.png',
   'ghost_normal.png',

@@ -9,6 +9,9 @@ const ASSET_DIR = path.join(OUT_DIR, 'asset', 'bundled');
 const ROOT_FILES = [
   'ainanika_icon.png',
   'ainanika_logo.png',
+  'button_dress.png',
+  'button_hanasu.png',
+  'button_session.png',
   'ghost.json',
   'ghost_design.json',
   'ghost_excited.png',

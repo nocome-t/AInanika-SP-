@@ -21,7 +21,7 @@ const DEFAULT_EXPRESSION_MAP = {
 };
 
 const STORAGE_KEY = 'ainanika-web-state-v1';
-const ASSET_VERSION = '20260608-anchor-restore';
+const ASSET_VERSION = '20260608-button-icons';
 const IDLE_GHOST_FILE = 'ghost_nutral.png';
 const CRITICAL_APNG_FILES = [IDLE_GHOST_FILE];
 const DEFAULT_USER_NAME = 'キミ';
