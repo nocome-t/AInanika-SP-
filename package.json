@@ -1,0 +1,14 @@
+{
+  "name": "ainanika-web",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "build:cloudflare": "node scripts/build-cloudflare.cjs",
+    "deploy:cloudflare": "npm run build:cloudflare && wrangler pages deploy public",
+    "web": "node server.js",
+    "start": "node server.js"
+  },
+  "devDependencies": {
+    "wrangler": "^4.98.0"
+  }
+}

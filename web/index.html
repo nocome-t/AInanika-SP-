@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AInanika Web</title>
+  <link rel="icon" type="image/png" sizes="407x407" href="/asset/bundled/ainanika_icon.png?v=20260608-favicon">
+  <link rel="apple-touch-icon" href="/asset/bundled/ainanika_icon.png?v=20260608-favicon">
+  <script async src="https://www.googletagmanager.com/gtag/js?id=G-MCWY6DF562"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+    gtag('config', 'G-MCWY6DF562');
+  </script>
+  <link rel="stylesheet" href="/styles.css?v=20260608-anchor-restore">
+</head>
+<body>
+  <main class="appShell" data-mode="single" data-loading="true">
+    <div class="loadingScreen" id="loadingScreen" role="status" aria-live="polite">
+      <div class="loadingBox">
+        <img class="loadingLogo" src="/asset/bundled/ainanika_logo.png" alt="Ai何か">
+        <div class="loadingTrack">
+          <div class="loadingBarFill" id="loadingBarFill"></div>
+        </div>
+        <p id="loadingText">loading...</p>
+      </div>
+    </div>
+
+    <section class="stage" aria-label="AInanika">
+      <header class="topBar">
+        <div class="brandBlock">
+          <img class="brandLogo" src="/asset/bundled/ainanika_logo.png" alt="Ai何か">
+          <span class="versionText">Web ver.0.1.0</span>
+        </div>
+        <button class="menuButton" id="menuButton" type="button" aria-label="メニューを開く" aria-expanded="false">
+          <span></span>
+          <span></span>
+          <span></span>
+        </button>
+      </header>
+
+      <div class="balloon hidden" id="leftBalloon"></div>
+      <div class="balloon balloonRight hidden" id="rightBalloon"></div>
+
+      <div class="ghostWrap leftGhostWrap" id="leftGhostWrap">
+        <img id="leftGhost" class="ghost" alt="Ghost" draggable="false">
+      </div>
+      <div class="ghostWrap rightGhostWrap hidden" id="rightGhostWrap">
+        <img id="rightGhost" class="ghost" alt="CrossTalk Ghost" draggable="false">
+      </div>
+
+      <div class="quickActions" aria-label="ショートカット">
+        <button class="quickAction" id="quickTalk" type="button">
+          <span class="quickIcon">...</span>
+          <span>何か話して</span>
+        </button>
+        <button class="quickAction" id="quickConversation" type="button">
+          <span class="quickIcon">talk</span>
+          <span>会話モード</span>
+        </button>
+        <button class="quickAction" id="quickShell" type="button">
+          <span class="quickIcon">dress</span>
+          <span>お着替え</span>
+        </button>
+      </div>
+
+      <div class="bottomPanel">
+        <form id="messageForm" class="messageForm">
+          <input id="messageInput" type="text" autocomplete="off" enterkeyhint="send" placeholder="メッセージを入力">
+          <button id="sendButton" class="sendButton" type="submit">送信</button>
+        </form>
+
+        <nav id="menuBar" class="menuBar hidden" aria-label="AInanika menu">
+          <button class="arrowButton" id="prevMenu" type="button" aria-label="前のメニュー">‹</button>
+          <div class="menuItems" id="menuItems"></div>
+          <button class="arrowButton" id="nextMenu" type="button" aria-label="次のメニュー">›</button>
+        </nav>
+      </div>
+    </section>
+
+    <div class="modal hidden" id="modal">
+      <div class="modalBox">
+        <p id="modalText"></p>
+        <div id="choiceList" class="choiceList"></div>
+        <input id="modalInput" type="text" autocomplete="off">
+        <div class="modalActions">
+          <button id="modalCancel" type="button">やめる</button>
+          <button id="modalSubmit" type="button">教える</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="notice hidden" id="notice"></div>
+  </main>
+
+  <script src="/app.js?v=20260608-anchor-restore"></script>
+</body>
+</html>
