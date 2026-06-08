@@ -1,7 +1,0 @@
-name = "ainanika"
-compatibility_date = "2026-06-08"
-pages_build_output_dir = "public"
-
-[vars]
-OPENAI_MODEL = "gpt-5-mini"
-RATE_LIMIT_MAX = "24"

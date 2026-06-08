@@ -159,7 +159,6 @@ Cloudflare Pages + Pages Functionsを使うと、Macを閉じていても `ainan
 - `functions/api/bootstrap.js`: Ghost設定と素材一覧を返すAPI
 - `functions/api/respond.js`: OpenAI Responses APIを呼ぶAPI
 - `scripts/build-cloudflare.cjs`: Cloudflare Pages用の `public/` 生成
-- `wrangler.toml`: Cloudflare Pages/Wrangler設定
 
 ローカルビルド:
 
@@ -193,7 +192,10 @@ Framework preset: None
 Build command: npm install && npm run build:cloudflare
 Build output directory: public
 Root directory: AInanika(SP) の場所
+Deploy command: 空欄
 ```
+
+`Workers` ではなく `Pages` として作成してください。`Deploy command` に `wrangler deploy` や `npm run deploy:cloudflare` は入れません。
 
 環境変数とSecret:
 
