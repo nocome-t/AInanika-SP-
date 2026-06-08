@@ -68,9 +68,9 @@ ALLOW_BROWSER_API_KEY_CONFIG=1 npm run web
 - `web/styles.css`: Web版の見た目
 - `persona.txt`, `topics.json`, `ghost_*.png`: Web版に同梱する標準Ghost素材
 
-## ainanika.com 常時公開設定
+## ainanika.com 旧Mac公開設定
 
-このMacでは、Cloudflare Tunnelの named tunnel `ainanika-sp` を使って次のURLを公開しています。
+以前は、このMacのCloudflare Tunnel named tunnel `ainanika-sp` を使って次のURLを公開していました。
 
 - https://ainanika.com
 - https://www.ainanika.com
@@ -105,7 +105,8 @@ launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.ainanika.web.plist
 launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.ainanika.cloudflared.plist
 ```
 
-この公開は、このMacが起動していてユーザー `t_murai` がログインしている間に動作します。Macをスリープ、シャットダウン、ネットワーク切断すると公開URLも応答できなくなります。
+この旧公開は、Macが起動していてユーザー `t_murai` がログインしている間だけ動く構成でした。
+現在の本番公開はCloudflare Pagesへ移行済みのため、旧Mac常駐のLaunchAgentは停止しています。
 
 ## PCを閉じても動く公開に切り替える場合
 
@@ -152,6 +153,24 @@ Renderで初回デプロイ後、Renderが発行する `https://...onrender.com/
 
 Cloudflare Pages + Pages Functionsを使うと、Macを閉じていても `ainanika.com` から利用できます。
 静的ファイルはPagesで配信し、OpenAI APIを呼ぶ `/api/respond` だけをPages Functionsで実行します。
+
+現在の本番:
+
+- https://ainanika.com
+- https://www.ainanika.com
+- https://ainanika-sp.pages.dev
+
+ヘルスチェック:
+
+```bash
+curl https://ainanika.com/api/health
+```
+
+期待値:
+
+```json
+{"ok":true,"hasApiKey":true,"model":"gpt-5-mini","runtime":"cloudflare-pages"}
+```
 
 この方式で追加した主なファイル:
 
