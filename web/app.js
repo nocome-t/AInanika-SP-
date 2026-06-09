@@ -21,12 +21,17 @@ const DEFAULT_EXPRESSION_MAP = {
 };
 
 const STORAGE_KEY = 'ainanika-web-state-v1';
-const ASSET_VERSION = '20260608-menu-pc-labels';
+const ASSET_VERSION = '20260609-background-image';
 const IDLE_GHOST_FILE = 'ghost_nutral.png';
 const CRITICAL_APNG_FILES = [IDLE_GHOST_FILE];
 const DEFAULT_USER_NAME = 'キミ';
 const MAX_HISTORY = 20;
 const MAX_FACTS = 30;
+const BACKGROUND_DB_NAME = 'ainanika-web-assets';
+const BACKGROUND_STORE_NAME = 'backgrounds';
+const BACKGROUND_KEY = 'custom-background';
+const MIN_BACKGROUND_WIDTH = 480;
+const MIN_BACKGROUND_HEIGHT = 720;
 
 const elements = {};
 const state = {
@@ -49,6 +54,7 @@ const state = {
   ime: { input: false, modal: false },
   modalConfirm: null,
   nextCrosstalkSpeaker: 0,
+  backgroundObjectUrl: '',
 };
 
 function $(id) {
@@ -102,6 +108,120 @@ function showNotice(message, timeout = 3200) {
   elements.notice.classList.remove('hidden');
   clearTimeout(showNotice.timer);
   showNotice.timer = setTimeout(() => elements.notice.classList.add('hidden'), timeout);
+}
+
+function openBackgroundDb() {
+  return new Promise((resolve, reject) => {
+    const request = indexedDB.open(BACKGROUND_DB_NAME, 1);
+    request.onupgradeneeded = () => {
+      const db = request.result;
+      if (!db.objectStoreNames.contains(BACKGROUND_STORE_NAME)) {
+        db.createObjectStore(BACKGROUND_STORE_NAME);
+      }
+    };
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error || new Error('背景画像の保存領域を開けませんでした。'));
+  });
+}
+
+async function useBackgroundStore(mode, operation) {
+  const db = await openBackgroundDb();
+  try {
+    return await new Promise((resolve, reject) => {
+      const transaction = db.transaction(BACKGROUND_STORE_NAME, mode);
+      const store = transaction.objectStore(BACKGROUND_STORE_NAME);
+      const request = operation(store);
+      request.onsuccess = () => resolve(request.result);
+      request.onerror = () => reject(request.error || new Error('背景画像の保存に失敗しました。'));
+    });
+  } finally {
+    db.close();
+  }
+}
+
+function saveBackgroundImage(blob) {
+  return useBackgroundStore('readwrite', (store) => store.put(blob, BACKGROUND_KEY));
+}
+
+function loadBackgroundImage() {
+  return useBackgroundStore('readonly', (store) => store.get(BACKGROUND_KEY));
+}
+
+function deleteBackgroundImage() {
+  return useBackgroundStore('readwrite', (store) => store.delete(BACKGROUND_KEY));
+}
+
+function readImageDimensions(blob) {
+  return new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(blob);
+    const image = new Image();
+    image.onload = () => {
+      resolve({ width: image.naturalWidth, height: image.naturalHeight });
+      URL.revokeObjectURL(url);
+    };
+    image.onerror = () => {
+      URL.revokeObjectURL(url);
+      reject(new Error('画像を読み込めませんでした。'));
+    };
+    image.src = url;
+  });
+}
+
+function applyBackgroundImage(blob) {
+  if (state.backgroundObjectUrl) URL.revokeObjectURL(state.backgroundObjectUrl);
+  state.backgroundObjectUrl = blob ? URL.createObjectURL(blob) : '';
+  elements.stage.style.backgroundImage = state.backgroundObjectUrl
+    ? `url("${state.backgroundObjectUrl}")`
+    : '';
+}
+
+async function restoreBackgroundImage() {
+  try {
+    const blob = await loadBackgroundImage();
+    if (blob instanceof Blob) applyBackgroundImage(blob);
+  } catch (error) {
+    console.warn('Background image could not be restored:', error);
+  }
+}
+
+function chooseBackgroundImage() {
+  setMenuOpen(false);
+  elements.backgroundImageInput.value = '';
+  elements.backgroundImageInput.click();
+}
+
+async function handleBackgroundImageSelection() {
+  const file = elements.backgroundImageInput.files?.[0];
+  if (!file) return;
+  if (!file.type.startsWith('image/')) {
+    showNotice('画像ファイルを選んでください。', 5200);
+    return;
+  }
+
+  try {
+    const { width, height } = await readImageDimensions(file);
+    if (width < MIN_BACKGROUND_WIDTH || height < MIN_BACKGROUND_HEIGHT) {
+      showNotice(`背景画像は横${MIN_BACKGROUND_WIDTH}px以上・縦${MIN_BACKGROUND_HEIGHT}px以上が必要です。`, 6200);
+      return;
+    }
+
+    await saveBackgroundImage(file);
+    applyBackgroundImage(file);
+    showNotice('背景画像を変更しました。');
+  } catch (error) {
+    showNotice(error.message || '背景画像を設定できませんでした。', 6200);
+  }
+}
+
+async function resetBackgroundImage() {
+  setMenuOpen(false);
+  try {
+    await deleteBackgroundImage();
+    applyBackgroundImage(null);
+    showNotice('背景画像を標準に戻しました。');
+  } catch (error) {
+    showNotice(error.message || '背景画像を戻せませんでした。', 6200);
+  }
 }
 
 async function api(path, options = {}) {
@@ -667,13 +787,19 @@ const menuPages = [
     ['CrossTalk\n（PCのみ）', () => triggerCrosstalkMode()],
     ['接続状態', () => showApiKeyDialog()],
   ],
+  [
+    ['背景画像変更', () => chooseBackgroundImage()],
+    ['背景を戻す', () => resetBackgroundImage()],
+  ],
 ];
 
 function renderMenu() {
   elements.menuItems.innerHTML = '';
   elements.prevMenu.disabled = state.menuPage === 0;
   elements.nextMenu.disabled = state.menuPage === menuPages.length - 1;
-  for (const [label, action] of menuPages[state.menuPage]) {
+  const currentPage = menuPages[state.menuPage];
+  elements.menuItems.style.gridTemplateColumns = `repeat(${currentPage.length}, minmax(0, 1fr))`;
+  for (const [label, action] of currentPage) {
     const button = document.createElement('button');
     button.type = 'button';
     button.className = 'menuItem';
@@ -926,6 +1052,7 @@ function setupEvents() {
   });
   elements.leftBalloon.addEventListener('click', showNextMessage);
   elements.rightBalloon.addEventListener('click', showNextMessage);
+  elements.backgroundImageInput.addEventListener('change', handleBackgroundImageSelection);
 
   elements.messageForm.addEventListener('submit', (event) => {
     event.preventDefault();
@@ -969,13 +1096,14 @@ async function boot() {
     'messageForm', 'messageInput', 'sendButton', 'menuBar', 'menuItems',
     'prevMenu', 'nextMenu', 'modal', 'modalText', 'modalInput',
     'choiceList', 'modalCancel', 'modalSubmit', 'notice',
-    'loadingScreen', 'loadingText', 'loadingBarFill',
+    'loadingScreen', 'loadingText', 'loadingBarFill', 'stage', 'backgroundImageInput',
   ]) {
     elements[id] = $(id);
   }
 
   setupEvents();
   renderMenu();
+  await restoreBackgroundImage();
 
   const bootData = await api('/api/bootstrap');
   state.hasApiKey = bootData.hasApiKey;

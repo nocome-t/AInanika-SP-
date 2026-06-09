@@ -13,7 +13,7 @@
     gtag('js', new Date());
     gtag('config', 'G-MCWY6DF562');
   </script>
-  <link rel="stylesheet" href="/styles.css?v=20260608-menu-pc-labels">
+  <link rel="stylesheet" href="/styles.css?v=20260609-background-image">
 </head>
 <body>
   <main class="appShell" data-mode="single" data-loading="true">
@@ -27,7 +27,7 @@
       </div>
     </div>
 
-    <section class="stage" aria-label="AInanika">
+    <section class="stage" id="stage" aria-label="AInanika">
       <header class="topBar">
         <div class="brandBlock">
           <img class="brandLogo" src="/asset/bundled/ainanika_logo.png" alt="Ai何か">
@@ -77,6 +77,8 @@
           <button class="arrowButton" id="nextMenu" type="button" aria-label="次のメニュー">›</button>
         </nav>
       </div>
+
+      <input id="backgroundImageInput" type="file" accept="image/*" hidden>
     </section>
 
     <div class="modal hidden" id="modal">
@@ -94,6 +96,6 @@
     <div class="notice hidden" id="notice"></div>
   </main>
 
-  <script src="/app.js?v=20260608-menu-pc-labels"></script>
+  <script src="/app.js?v=20260609-background-image"></script>
 </body>
 </html>
